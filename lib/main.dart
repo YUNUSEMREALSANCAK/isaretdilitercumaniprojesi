@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'firebase_options.dart';
 import 'information_about_app/information_about_app_screen.dart';
 import 'appHome/navigation.dart';
+import 'services/quiz.dart';
 //1234567890Yy
 
 void main() async {
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: OnboardingScreen(),
+      home: QuizPage(),
     );
   }
 }

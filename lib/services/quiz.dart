@@ -1,96 +1,162 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'dart:math';
+import 'package:video_player/video_player.dart';
 
-class QuizService {
-  // Firestore'dan quiz verilerini çeken fonksiyon
-  Future<List<Map<String, dynamic>>> fetchQuizQuestions() async {
-    try {
-      // Firestore'daki 'quizQuestions' koleksiyonunu alır
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('quizQuestions')
-          .get();
+// Rastgele şıklar oluştururken kullanacağımız kelimeler
+const List<String> wordBank = [
+  'agac', 'aglamak', 'aksam', 'aksamyemegi', 'amca', 'araba', 'armut', 'asci',
+  'at', 'atm', 'baba', 'balik', 'bebek', 'bilgisayar', 'bilgisayarekrani',
+  'bugun', 'ceza', 'ekran', 'hapishane', 'kamera', 'kocburcu', 'mavi', 'mor',
+  'muhendis', 'para'
+];
 
-      // Soruları ve cevapları bir liste halinde döndürür
-      return querySnapshot.docs.map((doc) {
-        return {
-          'question': doc['question'],
-          'answers': List<String>.from(doc['answers']),
-          'correctAnswer': doc['correctAnswer'],
-        };
-      }).toList();
-    } catch (e) {
-      print("Hata oluştu: $e");
-      return [];
-    }
-  }
-}
+// Her videonun doğru cevabı ile eşleşmesini sağlayan yapı
+const Map<String, String> videoToAnswer = {
+  'agac.mp4': 'agac',
+  'aglamak.mp4': 'aglamak',
+  'aksam.mp4': 'aksam',
+  'aksamyemegi.mp4': 'aksamyemegi',
+  'amca.mp4': 'amca',
+  'araba.mp4': 'araba',
+  'armut.mp4': 'armut',
+  'asci.mp4': 'asci',
+  'at.mp4': 'at',
+  'atm.mp4': 'atm',
+  'baba.mp4': 'baba',
+  'balik.mp4': 'balik',
+  'bebek.mp4': 'bebek',
+  'bilgisayar.mp4': 'bilgisayar',
+  'bilgisayarekrani.mp4': 'bilgisayarekrani',
+  'bugun.mp4': 'bugun',
+  'ceza.mp4': 'ceza',
+  'ekran.mp4': 'ekran',
+  'hapishane.mp4': 'hapishane',
+  'kamera.mp4': 'kamera',
+  'kocburcu.mp4': 'kocburcu',
+  'mavi.mp4': 'mavi',
+  'mor.mp4': 'mor',
+  'muhendis.mp4': 'muhendis',
+  'para.mp4': 'para',
+};
 
 class QuizPage extends StatefulWidget {
+  const QuizPage({super.key});
+
   @override
   _QuizPageState createState() => _QuizPageState();
 }
 
 class _QuizPageState extends State<QuizPage> {
-  late Future<List<Map<String, dynamic>>> quizData;
+  VideoPlayerController? _controller;
+  String currentAnswer = '';
+  String? selectedAnswer;
+  bool answered = false;
+  List<String> currentOptions = [];
 
   @override
   void initState() {
     super.initState();
-    // Firestore'dan quiz sorularını çek
-    quizData = QuizService().fetchQuizQuestions();
+    loadNewQuestion();
+  }
+
+  // Yeni soruyu ve şıkları yükleyen fonksiyon
+  void loadNewQuestion() {
+    final random = Random();
+    final videoFile = videoToAnswer.keys.elementAt(random.nextInt(videoToAnswer.length));
+    final correctAnswer = videoToAnswer[videoFile]!;
+
+    // Rastgele diğer yanlış cevapları seçiyoruz
+    List<String> options = List.from(wordBank)..remove(correctAnswer);
+    options.shuffle();
+    List<String> wrongAnswers = options.take(3).toList();
+
+    // Doğru cevabı rastgele bir pozisyona yerleştiriyoruz
+    wrongAnswers.insert(random.nextInt(4), correctAnswer);
+
+    setState(() {
+      currentAnswer = correctAnswer;
+      answered = false;
+      selectedAnswer = null;
+      currentOptions = wrongAnswers;
+
+      _controller?.dispose();
+      _controller = VideoPlayerController.asset('assets/video/$videoFile')
+        ..initialize().then((_) {
+          setState(() {});
+          _controller!.play();
+        });
+      _controller!.setLooping(true); // Videonun sürekli tekrar etmesini sağla
+    });
+  }
+
+  // Şık seçimi
+  void selectAnswer(String answer) {
+    setState(() {
+      answered = true;
+      selectedAnswer = answer;
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Quiz')),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: quizData,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(child: Text('Bir hata oluştu'));
-          }
-
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('Hiç soru yok'));
-          }
-
-          // Soruları ve cevapları ekrana getir
-          var questionData = snapshot.data![0]; // İlk soruyu çek
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Text(
-                  questionData['question'], // Soruyu göster
-                  style: TextStyle(fontSize: 24),
-                ),
-                SizedBox(height: 20),
-                ...questionData['answers'].map<Widget>((answer) {
-                  return ElevatedButton(
-                    onPressed: () {
-                      // Cevap kontrolü burada yapılabilir
-                      if (answer == questionData['correctAnswer']) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Doğru cevap!')),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Yanlış cevap')),
-                        );
-                      }
-                    },
-                    child: Text(answer),
-                  );
-                }).toList(),
-              ],
+      appBar: AppBar(title: const Text('Quiz')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _controller != null && _controller!.value.isInitialized
+                ? AspectRatio(
+              aspectRatio: _controller!.value.aspectRatio,
+              child: VideoPlayer(_controller!),
+            )
+                : const Center(child: CircularProgressIndicator()),
+            const SizedBox(height: 20),
+            const Text(
+              'Yukarıda gösterilen işaret hangi kelimeye karşılık gelir?',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-          );
-        },
+            const SizedBox(height: 20),
+            // Şıklar
+            Expanded(
+              child: ListView.builder(
+                itemCount: currentOptions.length,
+                itemBuilder: (context, index) {
+                  String option = currentOptions[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: ElevatedButton(
+                      onPressed: answered
+                          ? null
+                          : () => selectAnswer(option),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: answered
+                            ? option == currentAnswer
+                            ? Colors.green // Doğru şık yeşil
+                            : option == selectedAnswer
+                            ? Colors.red // Yanlış şık kırmızı
+                            : null
+                            : null,
+                      ),
+                      child: Text(option),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: loadNewQuestion,
+        child: const Icon(Icons.refresh),
       ),
     );
   }
