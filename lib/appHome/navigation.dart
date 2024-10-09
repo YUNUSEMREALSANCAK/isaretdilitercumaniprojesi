@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:isaretdilitercumaniprojesi/services/quiz.dart';
 import 'package:isaretdilitercumaniprojesi/variables.dart';
 import 'package:isaretdilitercumaniprojesi/appHome/cardscreen.dart';
 
@@ -19,7 +20,7 @@ class _NavigationState extends State<Navigation> {
   // Her bir sayfa için bir liste
   static const List<Widget> _pages = <Widget>[
     HomePage(),
-    SearchPage(),
+    QuizPage(),
     NotificationsPage(),
     ProfilePage(email: 'user@example.com'),
   ];

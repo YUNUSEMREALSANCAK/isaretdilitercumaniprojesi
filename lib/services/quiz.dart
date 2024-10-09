@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'dart:async'; // Otomatik geçiş için
 import 'dart:math';
 import 'package:video_player/video_player.dart';
+import '../variables.dart';
+
+
 
 // Rastgele şıklar oluştururken kullanacağımız kelimeler
 const List<String> wordBank = [
@@ -92,9 +96,16 @@ class _QuizPageState extends State<QuizPage> {
   // Şık seçimi
   void selectAnswer(String answer) {
     setState(() {
-      answered = true;
       selectedAnswer = answer;
+      answered = true;
     });
+
+    // Cevap doğru ise 0.5 saniye sonra yeni soruya geç
+    if (answer == currentAnswer) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        loadNewQuestion();
+      });
+    }
   }
 
   @override
@@ -106,8 +117,10 @@ class _QuizPageState extends State<QuizPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Quiz')),
-      body: Padding(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: CustomTheme.primaryGradient, // Arka plan gradyanı
+        ),
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,9 +134,13 @@ class _QuizPageState extends State<QuizPage> {
             const SizedBox(height: 20),
             const Text(
               'Yukarıda gösterilen işaret hangi kelimeye karşılık gelir?',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: CustomTheme.black,
+              ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             // Şıklar
             Expanded(
               child: ListView.builder(
@@ -133,19 +150,27 @@ class _QuizPageState extends State<QuizPage> {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: ElevatedButton(
-                      onPressed: answered
-                          ? null
+                      onPressed: answered && selectedAnswer == currentAnswer
+                          ? null // Eğer doğru cevabı bulduysa artık basılmasın
                           : () => selectAnswer(option),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: answered
-                            ? option == currentAnswer
-                            ? Colors.green // Doğru şık yeşil
-                            : option == selectedAnswer
-                            ? Colors.red // Yanlış şık kırmızı
-                            : null
-                            : null,
+                          backgroundColor: answered && option == currentAnswer && selectedAnswer == currentAnswer
+                              ? Colors.green // Doğru şık sadece doğru cevaplandığında yeşil
+                              : answered && option == selectedAnswer
+                              ? Colors.red // Yanlış şık kırmızı
+                              : CustomTheme.colorPage2, // Varsayılan renk
+                        foregroundColor: CustomTheme.black, // Yazı rengi
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // Buton köşelerini yuvarla
+                        ),
                       ),
-                      child: Text(option),
+                      child: Text(
+                        option,
+                        style: const TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
                     ),
                   );
                 },
@@ -153,10 +178,6 @@ class _QuizPageState extends State<QuizPage> {
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: loadNewQuestion,
-        child: const Icon(Icons.refresh),
       ),
     );
   }

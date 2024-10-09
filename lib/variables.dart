@@ -16,6 +16,19 @@ class CustomTheme {
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
   );
+  static const LinearGradient secondaryGradient = LinearGradient(
+    colors: <Color>[colorPage2, colorPage1],
+    stops: <double>[1.0, 0.0],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
+  static const LinearGradient buttonGradient = LinearGradient(
+    colors: <Color>[Color(0xFF42A5F5), Color(0xFF1E88E5)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+
 }
 
 
