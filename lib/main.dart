@@ -1,9 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:isaretdilitercumaniprojesi/splash_screen.dart';
 import 'firebase_options.dart';
-import 'information_about_app/information_about_app_screen.dart';
-import 'appHome/navigation.dart';
-import 'services/quiz.dart';
 //1234567890Yy
 
 void main() async {
@@ -11,7 +9,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp( MyApp());
+  runApp( const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -19,8 +17,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: OnboardingScreen(),
+    return const MaterialApp(
+      home: SplashScreen(),
     );
   }
 }

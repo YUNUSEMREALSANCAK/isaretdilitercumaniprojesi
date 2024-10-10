@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../appHome/navigation.dart';
 import '../../services/auth.dart';
 import '../../variables.dart';
@@ -280,6 +281,7 @@ class _SignInState extends State<SignIn> {
   void _signIn() async {
     String email = loginEmailController.text.trim();
     String password = loginPasswordController.text.trim();
+
     if (email.isEmpty || password.isEmpty) {
       CustomSnackBar(context, const Text("Email or Password cannot be empty"));
       return;
@@ -288,6 +290,14 @@ class _SignInState extends State<SignIn> {
     try {
       await _auth.SignIn(email: email, password: password);
       CustomSnackBar(context, const Text("Login Successful"));
+
+      // Kullanıcı başarılı şekilde giriş yaptıktan sonra oturum bilgisini kaydet
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      bool success = await prefs.setBool('isLoggedIn', true);
+
+      if (!success) {
+        CustomSnackBar(context, const Text("Failed to save login status"));
+      }
 
       // Giriş başarılı olursa Navigation sayfasına yönlendirme
       Navigator.pushReplacement(
@@ -298,6 +308,8 @@ class _SignInState extends State<SignIn> {
       CustomSnackBar(context, Text("Login Failed: $e"));
     }
   }
+
+
 
 
   void _toggleLogin() {
