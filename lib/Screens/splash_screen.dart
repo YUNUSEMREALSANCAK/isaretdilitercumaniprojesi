@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:isaretdilitercumaniprojesi/variables.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../appHome/navigation.dart';
-import 'information_about_app/information_about_app_screen.dart';
+import '../../../Screens/navigation.dart';
+import 'information_about_app_screen/information_about_app_screen.dart';
 
 
 class SplashScreen extends StatefulWidget {

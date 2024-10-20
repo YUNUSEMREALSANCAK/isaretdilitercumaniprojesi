@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:isaretdilitercumaniprojesi/services/quiz.dart';
-import 'package:isaretdilitercumaniprojesi/variables.dart';
-import 'package:isaretdilitercumaniprojesi/appHome/cardscreen.dart';
 
+import '../variables.dart';
 import 'Notifications.dart';
 import 'Profile.dart';
+import 'cardscreen.dart';
+import 'quizPage/quiz_page.dart';
 
 class Navigation extends StatefulWidget {
   const Navigation({super.key});
@@ -15,6 +15,7 @@ class Navigation extends StatefulWidget {
 }
 
 class _NavigationState extends State<Navigation> {
+
   int _selectedIndex = 0;
 
   // Her bir sayfa için bir liste
@@ -22,7 +23,7 @@ class _NavigationState extends State<Navigation> {
     HomePage(),
     QuizPage(),
     NotificationsPage(),
-    ProfilePage(email: 'user@example.com'),
+    ProfilePage(email: '',),
   ];
 
   // Seçili sayfa değiştiğinde tetiklenecek fonksiyon

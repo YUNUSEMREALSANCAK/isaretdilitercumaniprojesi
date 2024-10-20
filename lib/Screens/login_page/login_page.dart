@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../utils/bubble_indicator_painter.dart';
-import '../variables.dart';
+import '../../utils/bubble_indicator_painter.dart';
+import '../../variables.dart';
 import 'widgets/sign_in.dart';
 import 'widgets/sign_up.dart';
 

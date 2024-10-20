@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../appHome/navigation.dart';
-import '../../services/auth.dart';
-import '../../variables.dart';
-import '../../widgets/snackbar.dart';
-
+import '../../../services/auth.dart';
+import '../../../variables.dart';
+import '../../../widgets/snackbar.dart';
+import '../../Profile.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -302,7 +301,10 @@ class _SignInState extends State<SignIn> {
       // Giriş başarılı olursa Navigation sayfasına yönlendirme
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const Navigation()),
+        MaterialPageRoute(
+          builder: (context) => ProfilePage(email: email),
+        ),
+
       );
     } catch (e) {
       CustomSnackBar(context, Text("Login Failed: $e"));

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../component.dart';
+
+import '../../component.dart';
+import '../../variables.dart';
 import '../login_page/login_page.dart';
 import 'information_about_variables.dart';
-import '../variables.dart';
 
 class OnboardingScreen extends StatelessWidget {
    OnboardingScreen({super.key});
