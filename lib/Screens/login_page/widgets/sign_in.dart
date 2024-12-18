@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../services/auth.dart';
 import '../../../variables.dart';
 import '../../../widgets/snackbar.dart';
-import '../../Profile.dart';
+import '../../Notifications.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -302,7 +302,7 @@ class _SignInState extends State<SignIn> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => ProfilePage(email: email),
+          builder: (context) => NotificationsPage(),
         ),
 
       );

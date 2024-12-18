@@ -34,7 +34,7 @@ class NotificationsPage extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [CustomTheme.colorPage3, CustomTheme.colorPage1],
+          colors: [CustomTheme.colorPage1, CustomTheme.colorPage2],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
