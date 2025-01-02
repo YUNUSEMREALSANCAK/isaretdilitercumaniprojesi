@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 import '../../variables.dart';
 import 'quiz_viewmodel.dart';
 
@@ -12,25 +11,58 @@ class QuizPage extends StatefulWidget {
 
 class _QuizPageState extends State<QuizPage> {
   final QuizViewModel _viewModel = QuizViewModel();
-  VideoPlayerController? _controller;
+  Image? _currentGif;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _viewModel.loadNewQuestion();
-    _loadVideo();
+    _initializeQuiz();
   }
 
-  void _loadVideo() {
-    final videoFile = _viewModel.currentQuiz?.videoFile;
-    if (videoFile != null) {
-      _controller?.dispose();
-      _controller = VideoPlayerController.asset('assets/video/$videoFile')
-        ..initialize().then((_) {
-          setState(() {});
-          _controller!.play();
-        });
-      _controller!.setLooping(true);
+  Future<void> _initializeQuiz() async {
+    await _loadNewQuestion();
+  }
+
+  Future<void> _loadNewQuestion() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    await _viewModel.loadNewQuestion();
+    await _loadGif();
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _loadGif() async {
+    final gifFile = _viewModel.currentQuiz?.gifFile;
+    if (gifFile != null) {
+      print('Gif yükleniyor: $gifFile');
+      setState(() {
+        _currentGif = Image.asset(
+          gifFile,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            print('Gif yükleme hatası: $error');
+            print('Hata ayrıntıları: $stackTrace');
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text('Gif yüklenemedi: $gifFile',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.red)),
+                ],
+              ),
+            );
+          },
+        );
+      });
     }
   }
 
@@ -40,88 +72,124 @@ class _QuizPageState extends State<QuizPage> {
     });
 
     if (_viewModel.isAnswerCorrect()) {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        _viewModel.loadNewQuestion();
-        _loadVideo();
+      Future.delayed(const Duration(milliseconds: 500), () async {
+        await _loadNewQuestion();
       });
     }
   }
 
   @override
-  void dispose() {
-    _controller?.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final currentQuiz = _viewModel.currentQuiz;
-    if (currentQuiz == null) return const CircularProgressIndicator();
+    if (_isLoading || currentQuiz == null) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: CustomTheme.primaryGradient,
-        ),
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _controller != null && _controller!.value.isInitialized
-                ? AspectRatio(
-              aspectRatio: _controller!.value.aspectRatio,
-              child: VideoPlayer(_controller!),
-            )
-                : const Center(child: CircularProgressIndicator()),
-            const SizedBox(height: 20),
-            const Text(
-              'Yukarıda gösterilen işaret hangi kelimeye karşılık gelir?',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: CustomTheme.black,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: ListView.builder(
-                itemCount: currentQuiz.options.length,
-                itemBuilder: (context, index) {
-                  String option = currentQuiz.options[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: ElevatedButton(
-                      onPressed: _viewModel.answered &&
-                          _viewModel.selectedAnswer ==
-                              currentQuiz.correctAnswer
-                          ? null
-                          : () => _handleAnswerSelection(option),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _viewModel.answered &&
-                            option == currentQuiz.correctAnswer &&
-                            _viewModel.selectedAnswer ==
-                                currentQuiz.correctAnswer
-                            ? Colors.green
-                            : _viewModel.answered &&
-                            option == _viewModel.selectedAnswer
-                            ? Colors.red
-                            : CustomTheme.colorPage2,
-                        foregroundColor: CustomTheme.black,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+      body: SafeArea(
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: CustomTheme.primaryGradient,
+          ),
+          child: Column(
+            children: [
+              Expanded(
+                flex: 4, // Gif alanı için 4 birim
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: _currentGif != null
+                                ? _currentGif!
+                                : const Center(
+                                    child: CircularProgressIndicator()),
+                          ),
                         ),
                       ),
-                      child: Text(
-                        option,
-                        style: const TextStyle(fontSize: 18),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Yukarıda gösterilen işaret hangi kelimeye karşılık gelir?',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: CustomTheme.black,
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ],
+              Expanded(
+                flex: 3, // Şıklar için 3 birim
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: currentQuiz.options.map((option) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 6.0),
+                                child: ElevatedButton(
+                                  onPressed: _viewModel.answered &&
+                                          _viewModel.selectedAnswer ==
+                                              currentQuiz.correctAnswer
+                                      ? null
+                                      : () => _handleAnswerSelection(option),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: _viewModel.answered &&
+                                            option ==
+                                                currentQuiz.correctAnswer &&
+                                            _viewModel.selectedAnswer ==
+                                                currentQuiz.correctAnswer
+                                        ? Colors.green
+                                        : _viewModel.answered &&
+                                                option ==
+                                                    _viewModel.selectedAnswer
+                                            ? Colors.red
+                                            : CustomTheme.colorPage2,
+                                    foregroundColor: CustomTheme.black,
+                                    minimumSize: Size(double.infinity, 50),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    option,
+                                    style: const TextStyle(fontSize: 18),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

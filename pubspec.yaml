@@ -63,8 +63,27 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - assets/learn_gifs/
-    - assets/video/
+     - assets/downloaded_gifs_aile/
+     - assets/downloaded_gifs_anatomi/
+     - assets/downloaded_gifs_aracgerec/
+     - assets/downloaded_gifs_cografya/
+     - assets/downloaded_gifs_dini/
+     - assets/downloaded_gifs_diyalog/
+     - assets/downloaded_gifs_duygu/
+     - assets/downloaded_gifs_hayvan/
+     - assets/downloaded_gifs_matematik/
+     - assets/downloaded_gifs_spor/
+     - assets/downloaded_gifs_teknoloji/
+     - assets/downloaded_gifs_zamir/
+     - assets/downloaded_gifs_zaman/
+     - assets/downloaded_gifs_ulke_kita/
+     - assets/downloaded_gifs_tip_saglik/
+     - assets/downloaded_gifs_sifat/
+     - assets/video/
+
+
+
+
 
 
   # The following line ensures that the Material Icons font is
