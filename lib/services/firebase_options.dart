@@ -47,29 +47,14 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBzQAfj9GeSKG8bAMVQJlPOY0HgQNB-Xwc',
-    appId: '1:733996798765:web:5ea52fcee28014dc4479a4',
-    messagingSenderId: '733996798765',
-    projectId: 'flutterisaretdilitercumani',
-    authDomain: 'flutterisaretdilitercumani.firebaseapp.com',
-    storageBucket: 'flutterisaretdilitercumani.appspot.com',
-    measurementId: 'G-WG653S3Q66',
+   
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCQl0SI56VKF-7SloF2HAfuxD_GSEkZlxo',
-    appId: '1:733996798765:android:8fc7f9c2aee4da3a4479a4',
-    messagingSenderId: '733996798765',
-    projectId: 'flutterisaretdilitercumani',
-    storageBucket: 'flutterisaretdilitercumani.appspot.com',
+   
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCfNKTcrVtbVYNand_Mw48Yh14B7nem6eo',
-    appId: '1:733996798765:ios:b6ef31b49f0a9dcf4479a4',
-    messagingSenderId: '733996798765',
-    projectId: 'flutterisaretdilitercumani',
-    storageBucket: 'flutterisaretdilitercumani.appspot.com',
-    iosBundleId: 'com.example.isaretdilitercumaniprojesi',
+    
   );
 }
